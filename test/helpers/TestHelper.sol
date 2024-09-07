@@ -125,7 +125,6 @@ abstract contract TestHelper is Test {
 
         // Setup factory
         factory.setLBPairImplementation(address(pairImplementation));
-        addAllAssetsToQuoteWhitelist();
         setDefaultFactoryPresets(DEFAULT_BIN_STEP);
 
         // Create router
@@ -194,17 +193,6 @@ abstract contract TestHelper is Test {
 
     function getIdFromPrice(uint256 price) internal pure returns (uint24 id) {
         id = PriceHelper.getIdFromPrice(price, DEFAULT_BIN_STEP);
-    }
-
-    function addAllAssetsToQuoteWhitelist() internal {
-        if (address(wnative) != address(0)) factory.addQuoteAsset(wnative);
-        if (address(usdc) != address(0)) factory.addQuoteAsset(usdc);
-        if (address(usdt) != address(0)) factory.addQuoteAsset(usdt);
-        if (address(wbtc) != address(0)) factory.addQuoteAsset(wbtc);
-        if (address(weth) != address(0)) factory.addQuoteAsset(weth);
-        if (address(link) != address(0)) factory.addQuoteAsset(link);
-        if (address(bnb) != address(0)) factory.addQuoteAsset(bnb);
-        if (address(taxToken) != address(0)) factory.addQuoteAsset(taxToken);
     }
 
     function setDefaultFactoryPresets(uint16 binStep) internal {
