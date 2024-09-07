@@ -14,6 +14,13 @@ This repository contains the Liquidity Book contracts, as well as tests and depl
 
 For more information, go to the [documentation](https://docs.traderjoexyz.com/) and the [whitepaper](https://github.com/traderjoe-xyz/LB-Whitepaper/blob/main/Joe%20v2%20Liquidity%20Book%20Whitepaper.pdf).
 
+## Citrus fork
+
+This repository is based on commit [24efde2ee26b1c65aebcc97a9ea848693b4d05d4](https://github.com/traderjoe-xyz/joe-v2/commit/24efde2ee26b1c65aebcc97a9ea848693b4d05d4) which was audited: [Core2.2 Audit](https://paladinsec.co/assets/audits/20240331_Paladin_TraderJoe_Core2.2_Final_Report.pdf)
+
+We made the following changes:
+- Removed `quoteAssetWhitelist` so that the LBFactory can be deployed without having to whitelists assets
+
 ## Install foundry
 
 Foundry documentation can be found [here](https://book.getfoundry.sh/forge/index.html).

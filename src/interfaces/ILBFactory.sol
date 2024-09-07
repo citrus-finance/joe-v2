@@ -14,8 +14,6 @@ import {ILBPair} from "./ILBPair.sol";
  */
 interface ILBFactory {
     error LBFactory__IdenticalAddresses(IERC20 token);
-    error LBFactory__QuoteAssetNotWhitelisted(IERC20 quoteAsset);
-    error LBFactory__QuoteAssetAlreadyWhitelisted(IERC20 quoteAsset);
     error LBFactory__AddressZero();
     error LBFactory__LBPairAlreadyExists(IERC20 tokenX, IERC20 tokenY, uint256 _binStep);
     error LBFactory__LBPairDoesNotExist(IERC20 tokenX, IERC20 tokenY, uint256 binStep);
@@ -77,10 +75,6 @@ interface ILBFactory {
 
     event PresetRemoved(uint256 indexed binStep);
 
-    event QuoteAssetAdded(IERC20 indexed quoteAsset);
-
-    event QuoteAssetRemoved(IERC20 indexed quoteAsset);
-
     function getMinBinStep() external pure returns (uint256);
 
     function getFeeRecipient() external view returns (address);
@@ -94,12 +88,6 @@ interface ILBFactory {
     function getNumberOfLBPairs() external view returns (uint256);
 
     function getLBPairAtIndex(uint256 id) external returns (ILBPair);
-
-    function getNumberOfQuoteAssets() external view returns (uint256);
-
-    function getQuoteAssetAtIndex(uint256 index) external view returns (IERC20);
-
-    function isQuoteAsset(IERC20 token) external view returns (bool);
 
     function getLBPairInformation(IERC20 tokenX, IERC20 tokenY, uint256 binStep)
         external
@@ -179,10 +167,6 @@ interface ILBFactory {
     function setFeeRecipient(address feeRecipient) external;
 
     function setFlashLoanFee(uint256 flashLoanFee) external;
-
-    function addQuoteAsset(IERC20 quoteAsset) external;
-
-    function removeQuoteAsset(IERC20 quoteAsset) external;
 
     function forceDecay(ILBPair lbPair) external;
 }

@@ -72,13 +72,6 @@ contract CoreDeployer is Script {
             factory.setLBPairImplementation(address(pairImplementation));
             console.log("LBPair implementation set on factory\n");
 
-            uint256 quoteAssets = ILBLegacyFactory(deployment.factoryV2).getNumberOfQuoteAssets();
-            for (uint256 j = 0; j < quoteAssets; j++) {
-                IERC20 quoteAsset = ILBLegacyFactory(deployment.factoryV2).getQuoteAsset(j);
-                factory.addQuoteAsset(quoteAsset);
-                console.log("Quote asset whitelisted -->", address(quoteAsset));
-            }
-
             uint256[] memory presetList = BipsConfig.getPresetList();
             for (uint256 j; j < presetList.length; j++) {
                 BipsConfig.FactoryPreset memory preset = BipsConfig.getPreset(presetList[j]);

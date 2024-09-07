@@ -57,7 +57,6 @@ contract LBFactory is Ownable2Step, AccessControl, ILBFactory {
     mapping(IERC20 => mapping(IERC20 => mapping(uint256 => LBPairInformation))) private _lbPairsInfo;
 
     EnumerableMap.UintToUintMap private _presets;
-    EnumerableSet.AddressSet private _quoteAssetWhitelist;
 
     /**
      * @dev Mapping from a (tokenA, tokenB) to a set of available bin steps, this is used to keep track of the
@@ -136,32 +135,6 @@ contract LBFactory is Ownable2Step, AccessControl, ILBFactory {
      */
     function getLBPairAtIndex(uint256 index) external view override returns (ILBPair lbPair) {
         return _allLBPairs[index];
-    }
-
-    /**
-     * @notice View function to return the number of quote assets whitelisted
-     * @return numberOfQuoteAssets The number of quote assets
-     */
-    function getNumberOfQuoteAssets() external view override returns (uint256 numberOfQuoteAssets) {
-        return _quoteAssetWhitelist.length();
-    }
-
-    /**
-     * @notice View function to return the quote asset whitelisted at index `index`
-     * @param index The index
-     * @return asset The address of the quoteAsset at index `index`
-     */
-    function getQuoteAssetAtIndex(uint256 index) external view override returns (IERC20 asset) {
-        return IERC20(_quoteAssetWhitelist.at(index));
-    }
-
-    /**
-     * @notice View function to return whether a token is a quotedAsset (true) or not (false)
-     * @param token The address of the asset
-     * @return isQuote Whether the token is a quote asset or not
-     */
-    function isQuoteAsset(IERC20 token) external view override returns (bool isQuote) {
-        return _quoteAssetWhitelist.contains(address(token));
     }
 
     /**
@@ -340,8 +313,6 @@ contract LBFactory is Ownable2Step, AccessControl, ILBFactory {
         if (!_isPresetOpen(preset) && !isOwner) {
             revert LBFactory__PresetIsLockedForUsers(msg.sender, binStep);
         }
-
-        if (!_quoteAssetWhitelist.contains(address(tokenY))) revert LBFactory__QuoteAssetNotWhitelisted(tokenY);
 
         if (tokenX == tokenY) revert LBFactory__IdenticalAddresses(tokenX);
 
@@ -623,34 +594,6 @@ contract LBFactory is Ownable2Step, AccessControl, ILBFactory {
 
         _flashLoanFee = flashLoanFee;
         emit FlashLoanFeeSet(oldFlashLoanFee, flashLoanFee);
-    }
-
-    /**
-     * @notice Function to add an asset to the whitelist of quote assets
-     * @dev Needs to be called by the owner
-     * Reverts if:
-     * - The quoteAsset is already whitelisted
-     * @param quoteAsset The quote asset (e.g: NATIVE, USDC...)
-     */
-    function addQuoteAsset(IERC20 quoteAsset) external override onlyOwner {
-        if (!_quoteAssetWhitelist.add(address(quoteAsset))) {
-            revert LBFactory__QuoteAssetAlreadyWhitelisted(quoteAsset);
-        }
-
-        emit QuoteAssetAdded(quoteAsset);
-    }
-
-    /**
-     * @notice Function to remove an asset from the whitelist of quote assets
-     * @dev Needs to be called by the owner
-     * Reverts if:
-     * - The quoteAsset was not whitelisted
-     * @param quoteAsset The quote asset (e.g: NATIVE, USDC...)
-     */
-    function removeQuoteAsset(IERC20 quoteAsset) external override onlyOwner {
-        if (!_quoteAssetWhitelist.remove(address(quoteAsset))) revert LBFactory__QuoteAssetNotWhitelisted(quoteAsset);
-
-        emit QuoteAssetRemoved(quoteAsset);
     }
 
     function _isPresetOpen(bytes32 preset) internal pure returns (bool) {

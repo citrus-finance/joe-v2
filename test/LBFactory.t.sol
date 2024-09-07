@@ -26,8 +26,6 @@ import "./mocks/MockHooks.sol";
  * 13. Remove quote asset from whitelist
  */
 contract LiquidityBinFactoryTest is TestHelper {
-    event QuoteAssetRemoved(IERC20 indexed _quoteAsset);
-    event QuoteAssetAdded(IERC20 indexed _quoteAsset);
     event LBPairImplementationSet(ILBPair oldLBPairImplementation, ILBPair LBPairImplementation);
     event LBPairCreated(
         IERC20 indexed tokenX, IERC20 indexed tokenY, uint256 indexed binStep, ILBPair LBPair, uint256 pid
@@ -102,7 +100,6 @@ contract LiquidityBinFactoryTest is TestHelper {
         LBFactory anotherFactory = new LBFactory(DEV, DEV, DEFAULT_FLASHLOAN_FEE);
 
         anotherFactory.setPreset(1, 1, 1, 1, 1, 1, 1, 1, false);
-        anotherFactory.addQuoteAsset(usdc);
 
         // Reverts if there is no implementation set
         vm.expectRevert(ILBFactory.LBFactory__ImplementationNotSet.selector);
@@ -248,12 +245,6 @@ contract LiquidityBinFactoryTest is TestHelper {
             DEFAULT_OPEN_STATE
         );
 
-        // Can't create pair if the quote asset is not whitelisted
-        vm.expectRevert(abi.encodeWithSelector(ILBFactory.LBFactory__QuoteAssetNotWhitelisted.selector, usdc));
-        newFactory.createLBPair(usdt, usdc, ID_ONE, DEFAULT_BIN_STEP);
-
-        // Can't create pair if the quote asset is the same as the base asset
-        newFactory.addQuoteAsset(usdc);
         vm.expectRevert(abi.encodeWithSelector(ILBFactory.LBFactory__IdenticalAddresses.selector, usdc));
         newFactory.createLBPair(usdc, usdc, ID_ONE, DEFAULT_BIN_STEP);
 
@@ -672,55 +663,6 @@ contract LiquidityBinFactoryTest is TestHelper {
         // Can't set to the same state
         vm.expectRevert(abi.encodeWithSelector(ILBFactory.LBFactory__PresetOpenStateIsAlreadyInTheSameState.selector));
         factory.setPresetOpenState(binStep, false);
-    }
-
-    function test_AddQuoteAsset() public {
-        uint256 numberOfQuoteAssetBefore = factory.getNumberOfQuoteAssets();
-
-        IERC20 newToken = new ERC20Mock(18);
-
-        assertEq(factory.isQuoteAsset(newToken), false, "test_AddQuoteAsset::1");
-
-        vm.expectEmit(true, true, true, true);
-        emit QuoteAssetAdded(newToken);
-        factory.addQuoteAsset(newToken);
-
-        assertEq(factory.isQuoteAsset(newToken), true, "test_AddQuoteAsset::2");
-        assertEq(factory.getNumberOfQuoteAssets(), numberOfQuoteAssetBefore + 1, "test_AddQuoteAsset::3");
-        assertEq(
-            address(newToken), address(factory.getQuoteAssetAtIndex(numberOfQuoteAssetBefore)), "test_AddQuoteAsset::4"
-        );
-
-        // Can't add if not the owner
-        vm.prank(ALICE);
-        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ALICE));
-        factory.addQuoteAsset(newToken);
-
-        // Can't add if the asset is already a quote asset
-        vm.expectRevert(abi.encodeWithSelector(ILBFactory.LBFactory__QuoteAssetAlreadyWhitelisted.selector, newToken));
-        factory.addQuoteAsset(newToken);
-    }
-
-    function test_RemoveQuoteAsset() public {
-        uint256 numberOfQuoteAssetBefore = factory.getNumberOfQuoteAssets();
-
-        assertEq(factory.isQuoteAsset(usdc), true, "test_RemoveQuoteAsset::1");
-
-        vm.expectEmit(true, true, true, true);
-        emit QuoteAssetRemoved(usdc);
-        factory.removeQuoteAsset(usdc);
-
-        assertEq(factory.isQuoteAsset(usdc), false, "test_RemoveQuoteAsset::2");
-        assertEq(factory.getNumberOfQuoteAssets(), numberOfQuoteAssetBefore - 1, "test_RemoveQuoteAsset::3");
-
-        // Can't remove if not the owner
-        vm.prank(ALICE);
-        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ALICE));
-        factory.removeQuoteAsset(usdc);
-
-        // Can't remove if the asset is not a quote asset
-        vm.expectRevert(abi.encodeWithSelector(ILBFactory.LBFactory__QuoteAssetNotWhitelisted.selector, usdc));
-        factory.removeQuoteAsset(usdc);
     }
 
     function test_ForceDecay() public {
