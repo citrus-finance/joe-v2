@@ -105,6 +105,8 @@ interface ILBRouter {
         IERC20[] tokenPath;
     }
 
+    event Referral(address indexed referral);
+
     function getFactory() external view returns (ILBFactory);
 
     function getFactoryV2_1() external view returns (ILBFactory);
@@ -135,7 +137,7 @@ interface ILBRouter {
         external
         returns (ILBPair pair);
 
-    function addLiquidity(LiquidityParameters calldata liquidityParameters)
+    function addLiquidity(LiquidityParameters calldata liquidityParameters, address referral)
         external
         returns (
             uint256 amountXAdded,
@@ -146,7 +148,7 @@ interface ILBRouter {
             uint256[] memory liquidityMinted
         );
 
-    function addLiquidityNATIVE(LiquidityParameters calldata liquidityParameters)
+    function addLiquidityNATIVE(LiquidityParameters calldata liquidityParameters, address referral)
         external
         payable
         returns (

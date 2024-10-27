@@ -108,7 +108,7 @@ contract LiquidityBinRouterTest is TestHelper {
             uint256 amountYLeft,
             uint256[] memory depositIds,
             uint256[] memory liquidityMinted
-        ) = router.addLiquidity(liquidityParameters);
+        ) = router.addLiquidity(liquidityParameters, address(0));
 
         // Check amounts
         assertEq(amountXAdded, liquidityParameters.amountX - amountXLeft, "testFuzz_AddLiquidityNoSlippage::1");
@@ -134,20 +134,20 @@ contract LiquidityBinRouterTest is TestHelper {
             getLiquidityParameters(usdc, usdt, amountYIn, ID_ONE, binNumber, gap);
 
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__WrongTokenOrder.selector));
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         // Revert if the liquidity arrays are not the same length
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
         liquidityParameters.deltaIds = new int256[](binNumber - 1);
 
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__LengthsMismatch.selector));
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
         liquidityParameters.distributionY = new uint256[](binNumber - 1);
 
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__LengthsMismatch.selector));
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         // Active Id required can't be greater than type(uint24).max
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
@@ -160,7 +160,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 liquidityParameters.idSlippage
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
         liquidityParameters.idSlippage = uint256(type(uint24).max) + 1;
@@ -172,20 +172,20 @@ contract LiquidityBinRouterTest is TestHelper {
                 liquidityParameters.idSlippage
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         // Absolute IDs can't overflow
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
         liquidityParameters.deltaIds[0] = -int256(uint256(ID_ONE)) - 1;
 
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__IdOverflows.selector, type(uint256).max));
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
         liquidityParameters.deltaIds[0] = int256(uint256(ID_ONE));
 
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__IdOverflows.selector, uint256(type(uint24).max) + 1));
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         // Revert if ID slippage is caught
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
@@ -200,7 +200,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 ID_ONE
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters.activeIdDesired = ID_ONE + 10;
 
@@ -212,7 +212,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 ID_ONE
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         // Revert if slippage is too high
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
@@ -227,7 +227,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 liquidityParameters.amountY
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
         liquidityParameters.amountYMin = liquidityParameters.amountY + 1;
@@ -241,7 +241,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 liquidityParameters.amountY
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         // Revert is the deadline passed
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
@@ -252,7 +252,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 ILBRouter.LBRouter__DeadlineExceeded.selector, liquidityParameters.deadline, block.timestamp
             )
         );
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
     }
 
     function test_AddLiquidityNATIVE() public {
@@ -271,7 +271,7 @@ contract LiquidityBinRouterTest is TestHelper {
             uint256 amountYLeft,
             uint256[] memory depositIds,
             uint256[] memory liquidityMinted
-        ) = router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters);
+        ) = router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters, address(0));
 
         // Check amounts
         assertEq(amountXAdded, liquidityParameters.amountX - amountXLeft, "test_AddLiquidityNATIVE::1");
@@ -288,7 +288,7 @@ contract LiquidityBinRouterTest is TestHelper {
 
         liquidityParameters = getLiquidityParameters(bnb, wnative, amountYIn, ID_ONE, binNumber, gap);
 
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
     }
 
     function test_revert_AddLiquidityNATIVE() public {
@@ -301,7 +301,7 @@ contract LiquidityBinRouterTest is TestHelper {
             getLiquidityParameters(usdc, wnative, amountYIn, ID_ONE, binNumber, gap);
 
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__WrongTokenOrder.selector));
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
 
         // Revert if for non WNATIVE pairs
         liquidityParameters = getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
@@ -316,7 +316,7 @@ contract LiquidityBinRouterTest is TestHelper {
                 liquidityParameters.amountY
             )
         );
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
 
         // Revert if the amount of NATIVE isn't correct
         liquidityParameters = getLiquidityParameters(wnative, usdc, amountYIn, ID_ONE, binNumber, gap);
@@ -332,7 +332,7 @@ contract LiquidityBinRouterTest is TestHelper {
             )
         );
         // liquidityParameters.amountX should be sent as message value
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
     }
 
     function test_RemoveLiquidity() public {
@@ -345,7 +345,7 @@ contract LiquidityBinRouterTest is TestHelper {
 
         // Add liquidity
         (uint256 amountXAdded, uint256 amountYAdded,,, uint256[] memory depositIds, uint256[] memory liquidityMinted) =
-            router.addLiquidity(liquidityParameters);
+            router.addLiquidity(liquidityParameters, address(0));
 
         ILBPair pair = factory.getLBPairInformation(usdt, usdc, DEFAULT_BIN_STEP).LBPair;
 
@@ -366,7 +366,7 @@ contract LiquidityBinRouterTest is TestHelper {
         }
 
         // Try with the token inversed
-        (amountXAdded, amountYAdded,,, depositIds, liquidityMinted) = router.addLiquidity(liquidityParameters);
+        (amountXAdded, amountYAdded,,, depositIds, liquidityMinted) = router.addLiquidity(liquidityParameters, address(0));
 
         (amountYOut, amountXOut) = router.removeLiquidity(
             usdc, usdt, DEFAULT_BIN_STEP, 0, 0, depositIds, liquidityMinted, address(this), block.timestamp
@@ -376,7 +376,7 @@ contract LiquidityBinRouterTest is TestHelper {
         assertApproxEqAbs(amountYOut, amountYAdded, 10, "test_RemoveLiquidity::7");
 
         // Try removing half of the liquidity
-        (amountXAdded, amountYAdded,,, depositIds, liquidityMinted) = router.addLiquidity(liquidityParameters);
+        (amountXAdded, amountYAdded,,, depositIds, liquidityMinted) = router.addLiquidity(liquidityParameters, address(0));
 
         for (uint256 i = 0; i < depositIds.length; i++) {
             liquidityMinted[i] = liquidityMinted[i] / 2;
@@ -400,7 +400,7 @@ contract LiquidityBinRouterTest is TestHelper {
 
         // Add liquidity
         (uint256 amountXAdded, uint256 amountYAdded,,, uint256[] memory depositIds, uint256[] memory liquidityMinted) =
-            router.addLiquidity(liquidityParameters);
+            router.addLiquidity(liquidityParameters, address(0));
 
         ILBPair pair = factory.getLBPairInformation(usdt, usdc, DEFAULT_BIN_STEP).LBPair;
         pair.approveForAll(address(router), true);
@@ -459,7 +459,7 @@ contract LiquidityBinRouterTest is TestHelper {
 
         // Add liquidity
         (uint256 amountXAdded, uint256 amountYAdded,,, uint256[] memory depositIds, uint256[] memory liquidityMinted) =
-            router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters);
+            router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters, address(0));
 
         ILBPair pair = factory.getLBPairInformation(wnative, usdc, DEFAULT_BIN_STEP).LBPair;
         pair.approveForAll(address(router), true);
@@ -488,7 +488,7 @@ contract LiquidityBinRouterTest is TestHelper {
 
         // Add liquidity
         (uint256 amountXAdded,,,, uint256[] memory depositIds, uint256[] memory liquidityMinted) =
-            router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters);
+            router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters, address(0));
 
         ILBPair pair = factory.getLBPairInformation(wnative, usdc, DEFAULT_BIN_STEP).LBPair;
         pair.approveForAll(address(router), true);
@@ -537,7 +537,7 @@ contract LiquidityBinRouterTest is TestHelper {
             getLiquidityParameters(usdt, usdc, 1e18, ID_ONE, 1, 0);
 
         liquidityParameters.to = address(router);
-        (,,,, uint256[] memory depositIds, uint256[] memory liquidityMinted) = router.addLiquidity(liquidityParameters);
+        (,,,, uint256[] memory depositIds, uint256[] memory liquidityMinted) = router.addLiquidity(liquidityParameters, address(0));
 
         ILBPair pair = factory.getLBPairInformation(usdt, usdc, DEFAULT_BIN_STEP).LBPair;
 
@@ -554,12 +554,40 @@ contract LiquidityBinRouterTest is TestHelper {
             );
         }
 
-        (,,,, depositIds, liquidityMinted) = router.addLiquidity(liquidityParameters);
+        (,,,, depositIds, liquidityMinted) = router.addLiquidity(liquidityParameters, address(0));
 
         // Can't sweep if non owner
         vm.expectRevert(abi.encodeWithSelector(ILBRouter.LBRouter__NotFactoryOwner.selector));
         vm.prank(ALICE);
         router.sweepLBToken(pair, DEV, depositIds, liquidityMinted);
+    }
+
+    event Referral(address indexed referral);
+
+    function test_AddLiquidityReferral() public {
+        uint256 amountYIn = 1e18;
+        uint24 binNumber = 7;
+        uint24 gap = 2;
+
+        ILBRouter.LiquidityParameters memory liquidityParameters =
+            getLiquidityParameters(usdt, usdc, amountYIn, ID_ONE, binNumber, gap);
+
+        vm.expectEmit();
+        emit Referral(address(1));
+        router.addLiquidity(liquidityParameters, address(1));
+    }
+
+    function test_AddLiquidityNATIVEReferral() public {
+        uint256 amountYIn = 1e18;
+        uint24 binNumber = 7;
+        uint24 gap = 2;
+
+        ILBRouter.LiquidityParameters memory liquidityParameters =
+            getLiquidityParameters(wnative, usdc, amountYIn, ID_ONE, binNumber, gap);
+
+        vm.expectEmit();
+        emit Referral(address(1));
+        router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters, address(1));
     }
 
     receive() external payable {

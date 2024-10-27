@@ -217,6 +217,7 @@ contract LBRouter is ILBRouter {
      * @notice Add liquidity while performing safety checks
      * @dev This function is compliant with fee on transfer tokens
      * @param liquidityParameters The liquidity parameters
+     * @param referral The referee address
      * @return amountXAdded The amount of token X added
      * @return amountYAdded The amount of token Y added
      * @return amountXLeft The amount of token X left (sent back to liquidityParameters.refundTo)
@@ -224,7 +225,7 @@ contract LBRouter is ILBRouter {
      * @return depositIds The ids of the deposits
      * @return liquidityMinted The amount of liquidity minted
      */
-    function addLiquidity(LiquidityParameters calldata liquidityParameters)
+    function addLiquidity(LiquidityParameters calldata liquidityParameters, address referral)
         external
         override
         returns (
@@ -248,12 +249,17 @@ contract LBRouter is ILBRouter {
 
         (amountXAdded, amountYAdded, amountXLeft, amountYLeft, depositIds, liquidityMinted) =
             _addLiquidity(liquidityParameters, lbPair);
+
+        if (referral != address(0)) {
+            emit Referral(referral);
+        }
     }
 
     /**
      * @notice Add liquidity with NATIVE while performing safety checks
      * @dev This function is compliant with fee on transfer tokens
      * @param liquidityParameters The liquidity parameters
+     * @param referral The referee address
      * @return amountXAdded The amount of token X added
      * @return amountYAdded The amount of token Y added
      * @return amountXLeft The amount of token X left (sent back to liquidityParameters.refundTo)
@@ -261,7 +267,7 @@ contract LBRouter is ILBRouter {
      * @return depositIds The ids of the deposits
      * @return liquidityMinted The amount of liquidity minted
      */
-    function addLiquidityNATIVE(LiquidityParameters calldata liquidityParameters)
+    function addLiquidityNATIVE(LiquidityParameters calldata liquidityParameters, address referral)
         external
         payable
         override
@@ -299,6 +305,10 @@ contract LBRouter is ILBRouter {
 
         (amountXAdded, amountYAdded, amountXLeft, amountYLeft, depositIds, liquidityMinted) =
             _addLiquidity(liquidityParameters, _LBPair);
+
+        if (referral != address(0)) {
+            emit Referral(referral);
+        }
     }
 
     /**

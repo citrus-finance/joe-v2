@@ -35,13 +35,13 @@ contract LiquidityBinRouterSwapTest is TestHelper {
 
         ILBRouter.LiquidityParameters memory liquidityParameters =
             getLiquidityParameters(usdt, usdc, 100e18, ID_ONE, 15, 0);
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(wnative, usdc, 100e18, ID_ONE, 15, 0);
-        router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountX}(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(taxToken, wnative, 200e18, ID_ONE, 15, 0);
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
     }
 
     function test_GetIdFromPrice() public view {

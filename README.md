@@ -21,6 +21,7 @@ This repository is based on commit [24efde2ee26b1c65aebcc97a9ea848693b4d05d4](ht
 We made the following changes:
 - Removed `quoteAssetWhitelist` so that the LBFactory can be deployed without having to whitelists assets
 - Created `LBDeployer` that will deploy and setup the LBFactory and LBPair contracts
+- Emit `Referral` on adding liquidity
 
 ## Install foundry
 

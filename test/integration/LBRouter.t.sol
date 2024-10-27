@@ -52,10 +52,10 @@ contract LiquidityBinRouterForkTest is TestHelper {
         legacyRouterV2.addLiquidityAVAX{value: liquidityParameters.amountX}(liquidityParameters.toLegacy());
 
         liquidityParameters = getLiquidityParameters(weth, wnative, liquidityAmount, ID_ONE, 7, 0);
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(taxToken, wnative, liquidityAmount, ID_ONE, 7, 0);
-        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters);
+        router.addLiquidityNATIVE{value: liquidityParameters.amountY}(liquidityParameters, address(0));
     }
 
     function test_SwapExactTokensForTokens() public {

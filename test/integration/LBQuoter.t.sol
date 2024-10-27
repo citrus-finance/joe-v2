@@ -89,13 +89,13 @@ contract LiquidityBinQuoterTest is TestHelper {
         legacyRouterV2.addLiquidity(liquidityParameters.toLegacy());
 
         liquidityParameters = getLiquidityParameters(weth, usdc, highLiquidityAmount, ID_ONE, 7, 0);
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
 
         liquidityParameters = getLiquidityParameters(bnb, usdc, highLiquidityAmount, ID_ONE, 7, 0);
         legacyRouterV2.addLiquidity(liquidityParameters.toLegacy());
 
         liquidityParameters = getLiquidityParameters(bnb, usdc, lowLiquidityAmount, ID_ONE + 50, 7, 0);
-        router.addLiquidity(liquidityParameters);
+        router.addLiquidity(liquidityParameters, address(0));
     }
 
     function test_Constructor() public view {
